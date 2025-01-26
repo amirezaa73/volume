@@ -14,4 +14,4 @@ def get_binance_price():
     if response.status_code == 200:
         return jsonify(response.json())
     else:
-        return jsonify({"error": "Failed to fetch data from Binance"}), 500
+        return jsonify({"error": response.text()}), 500
