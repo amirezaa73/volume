@@ -1,7 +1,12 @@
 from flask import Flask, jsonify
-import requests
+from binance.client import Client
 
 app = Flask(__name__)
+
+# توکن API خود را وارد کنید
+api_key = "YOUR_API_KEY"
+api_secret = "YOUR_API_SECRET"
+client = Client(api_key, api_secret)
 
 @app.route('/')
 def home():
@@ -9,14 +14,9 @@ def home():
 
 @app.route('/binance', methods=['GET'])
 def get_binance_price():
-    url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
     try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
-        return jsonify(response.json())  # Return the JSON response from Binance
-    except requests.exceptions.RequestException as e:
-        # Return the exact error response from Binance, if available
-        if response is not None and response.text:
-            return jsonify({"error": "Binance API Error", "details": response.text}), response.status_code
-        else:
-            return jsonify({"error": "Request failed", "details": str(e)}), 500
+        # گرفتن قیمت بیت‌کوین به تتر (BTC/USDT)
+        price = client.get_symbol_ticker(symbol="BTCUSDT")
+        return jsonify(price)
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch data from Binance: {str(e)}"}), 500
